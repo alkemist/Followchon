@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def detected_boxes_with_save(
-        model, img_origine, results, global_traces,
+        model, img_origine, results,
         captures_dir,
         screens_dir,
         save_results=None, verbose=False,
@@ -20,8 +20,8 @@ def detected_boxes_with_save(
     captures_labels_dir = f"{captures_dir}/labels"
     captures_images_dir = f"{captures_dir}/images"
     screens_path = f"{screens_dir}/{filename}"
-    img_traced = img_origine.copy()
     logs, annotation_objs = list(), list()
+    img_traced = img_origine.copy()
 
     for r in results:
         boxes = r.boxes
@@ -58,12 +58,16 @@ def detected_boxes_with_save(
 
     if len(validated_annotations) > 0 and verbose:
         logs.sort()
-        if save_results:
-            print(f"{filename} : ", logs)
-        else:
-            print(" " * 24, logs)
+        # if save_results:
+        #     print(f"{filename} : ")
+        #     print("=> ", logs)
+        # else:
+        print(logs)
 
-    if len(validated_annotations) > 0 and save_results:
+    # @TODO Condition 4 : Si stitch > 1, noisette > 1 ou stitch + noisette != guinea pig
+    if (len(validated_annotations) > 0
+            and (len(validated_annotations) % 2) != 0  # # Condition 3 ; Impair => erreur
+            and save_results):
         cv2.imwrite(f'{screens_path}.jpg', img_traced)
 
         if not os.path.exists(captures_images_dir):
@@ -84,45 +88,47 @@ def detected_boxes_with_save(
 def valid_annotations(img, annotation_objs, logs):
     validated_annotations = list()
 
-    norm_diff_duplicate_error = 0.1
-    anonymes = list()
-    chons = list()
+    # norm_diff_duplicate_error = 0.1
+    # anonymes = list()
+    # chons = list()
 
     for annotation in annotation_objs:
-        annotation['duplicate'] = False
-        annotation['valid'] = False
+        # annotation['duplicate'] = False
+        # annotation['valid'] = False
+        #
+        # if annotation['index'] == 0:
+        #     for anonyme in anonymes:
+        #         # Condition 2 : Check is multiple guinea pig in the same place
+        #         annotation['duplicate'] = all(
+        #             abs(float(annotation['norm_points'][i]) - float(anonyme_coord)) < norm_diff_duplicate_error
+        #             for i, anonyme_coord in enumerate(anonyme)
+        #         )
+        #         if annotation['duplicate']:
+        #             break
+        # else:
+        #     for chon in chons:
+        #         # Condition 2 : Check is multiple stitch/noisette in the same place
+        #         annotation['duplicate'] = all(
+        #             abs(float(annotation['norm_points'][i]) - float(chon_coord)) < norm_diff_duplicate_error
+        #             for i, chon_coord in enumerate(chon)
+        #         )
+        #         if annotation['duplicate']:
+        #             break
+        #
+        # if not annotation['duplicate']:
+        #     if annotation['index'] == 0:
+        #         anonymes.append(annotation['norm_points'])
+        #     else:
+        #         chons.append(annotation['norm_points'])
+        #
+        # if not annotation['duplicate']:
+        #     annotation['valid'] = True
+        #     validated_annotations.append(annotation['line'])
 
-        if annotation['index'] == 0:
-            for anonyme in anonymes:
-                # Condition 2 : Check is multiple guinea pig in the same place
-                annotation['duplicate'] = all(
-                    abs(float(annotation['norm_points'][i]) - float(anonyme_coord)) < norm_diff_duplicate_error
-                    for i, anonyme_coord in enumerate(anonyme)
-                )
-                if annotation['duplicate']:
-                    break
-        else:
-            for chon in chons:
-                # Condition 2 : Check is multiple stitch/noisette in the same place
-                annotation['duplicate'] = all(
-                    abs(float(annotation['norm_points'][i]) - float(chon_coord)) < norm_diff_duplicate_error
-                    for i, chon_coord in enumerate(chon)
-                )
-                if annotation['duplicate']:
-                    break
+        validated_annotations.append(annotation['line'])
+        logs.append([annotation['index'], annotation['label'], annotation['conf']]) # , annotation['valid']
 
-        if not annotation['duplicate']:
-            if annotation['index'] == 0:
-                anonymes.append(annotation['norm_points'])
-            else:
-                chons.append(annotation['norm_points'])
-
-        if not annotation['duplicate']:
-            annotation['valid'] = True
-            validated_annotations.append(annotation['line'])
-
-        logs.append([annotation['index'], annotation['label'], annotation['conf'], annotation['valid']])
-
+        #if annotation['index'] > 0:
         img = trace_detected_box_coords(
             img,
             annotation['orth_points'][0], annotation['orth_points'][1],
@@ -166,7 +172,7 @@ def detected_boxes(
     for r in results:
         boxes = r.boxes
         for box in boxes:
-            (img_traced, _) = trace_detected_box(
+            img_traced = trace_detected_box(
                 model, img_traced, box, font_scale
             )
 
