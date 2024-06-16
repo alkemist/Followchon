@@ -13,6 +13,8 @@
 .env
 yolov8n.pt
 
+__pycache__
+
 /live/captures/
 !/live/captures/.gitignore
 /live/records/
