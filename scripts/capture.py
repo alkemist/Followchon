@@ -12,23 +12,23 @@ from functions import list_files, detected_boxes_with_save, resize_with_ratio
 #live_stream_path = os.getenv('LIVE_STREAM_PATH')
 # venv/bin/python scripts/capture.py
 
-check_all_records = True
+check_all_records = False
 save_enabled = True
 delete_record = True
-delete_old_record = False
-infinite = False
-verbose = True
+delete_old_record = True
+infinite = True
+verbose = False
+show_result = False
 
 result_width = 1024
 result_height = 768
 
 write_capture_video = False
 
-model = YOLO('models/guinea-pig-v3+chons+camera-v4.pt')
+model = YOLO('models/guinea-pig-v3+chons+camera-v5.pt')
 live_path = 'live'
 records_directory = 'records'
 captures_directory = 'captures'
-screens_directory = 'screens'
 records_path = f"{live_path}/{records_directory}"
 stop = False
 
@@ -64,7 +64,6 @@ async def async_inference(frame, _save_results):
         frame,
         results,
         f"{live_path}/{captures_directory}",
-        f"{live_path}/{screens_directory}",
         _save_results,
         verbose,
         result_width,
@@ -81,12 +80,11 @@ async def async_inference(frame, _save_results):
         # for packet in stream.encode(frame):
         #     container.mux(packet)
 
-    cv2.imshow('Camera', image_result)
+    if show_result:
+        cv2.imshow('Camera', image_result)
 
 
 while not stop:
-
-    cap = cv2.VideoCapture("live/records/2024-06-14_10-00-00.mkv")
     records = list_files(records_path, r'.*\.(mkv)$')
     records_count = len(records)
 
@@ -116,9 +114,10 @@ while not stop:
 
             if ret:
                 frameId = cap.get(1)  # current frame number
-                save_results = save_enabled # and frameId % math.floor(frameRate) == 0
+                save_results = save_enabled and frameId % math.floor(frameRate) == 0
 
-                asyncio.run(async_inference(frame, save_results))
+                if show_result or save_results:
+                    asyncio.run(async_inference(frame, save_results))
             else:
                 print(f"End record : {last_record}")
 
@@ -127,7 +126,7 @@ while not stop:
 
                 break
 
-            if cv2.waitKey(1) == ord('q'):
+            if show_result and cv2.waitKey(1) == ord('q'):
                 stop = True
 
         cap.release()
@@ -144,4 +143,5 @@ if output is not None:
 # if container is not None:
 #      container.close()
 
-cv2.destroyAllWindows()
+if show_result:
+    cv2.destroyAllWindows()

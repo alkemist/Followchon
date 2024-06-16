@@ -12,14 +12,12 @@ from pathlib import Path
 def detected_boxes_with_save(
         model, img_origine, results,
         captures_dir,
-        screens_dir,
         save_results=None, verbose=False,
         result_width=1024, result_height=768,
 ):
     filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{random.randint(0, 9)}"
     captures_labels_dir = f"{captures_dir}/labels"
     captures_images_dir = f"{captures_dir}/images"
-    screens_path = f"{screens_dir}/{filename}"
     logs, annotation_objs = list(), list()
     img_traced = img_origine.copy()
 
@@ -54,9 +52,13 @@ def detected_boxes_with_save(
                     }
                 )
 
-    img_traced, validated_annotations = valid_annotations(img_traced, annotation_objs, logs)
+    (
+        img_traced,
+        annotations,
+        capture_ok
+    ) = valid_annotations(img_traced, annotation_objs, logs)
 
-    if len(validated_annotations) > 0 and verbose:
+    if len(annotations) > 0 and verbose:
         logs.sort()
         # if save_results:
         #     print(f"{filename} : ")
@@ -64,71 +66,72 @@ def detected_boxes_with_save(
         # else:
         print(logs)
 
-    # @TODO Condition 4 : Si stitch > 1, noisette > 1 ou stitch + noisette != guinea pig
-    if (len(validated_annotations) > 0
-            and (len(validated_annotations) % 2) != 0  # # Condition 3 ; Impair => erreur
-            and save_results):
-        cv2.imwrite(f'{screens_path}.jpg', img_traced)
-
+    if (len(annotations) > 0
+            and save_results and capture_ok
+    ):
         if not os.path.exists(captures_images_dir):
             os.makedirs(captures_images_dir)
 
         img_reduced = resize_with_ratio(img_origine, result_width, result_height)
         cv2.imwrite(f'{captures_images_dir}/{filename}.jpg', img_reduced)
 
-        validated_annotations.sort()
+        annotations.sort()
 
         file = Path(f'{captures_labels_dir}/{filename}.txt')
         file.parent.mkdir(parents=True, exist_ok=True)
-        file.write_text("".join(validated_annotations))
+        file.write_text("".join(annotations))
 
     return resize_with_ratio(img_traced, result_width, result_height)
 
 
 def valid_annotations(img, annotation_objs, logs):
-    validated_annotations = list()
+    annotations = list()
 
-    # norm_diff_duplicate_error = 0.1
-    # anonymes = list()
-    # chons = list()
+    norm_diff_duplicate_error = 0.1
+    anonymes = list()
+    chons = list()
+
+    anonyme_count = 0
+    noisette_count = 0
+    stitch_count = 0
+    duplicate = False
 
     for annotation in annotation_objs:
-        # annotation['duplicate'] = False
-        # annotation['valid'] = False
-        #
-        # if annotation['index'] == 0:
-        #     for anonyme in anonymes:
-        #         # Condition 2 : Check is multiple guinea pig in the same place
-        #         annotation['duplicate'] = all(
-        #             abs(float(annotation['norm_points'][i]) - float(anonyme_coord)) < norm_diff_duplicate_error
-        #             for i, anonyme_coord in enumerate(anonyme)
-        #         )
-        #         if annotation['duplicate']:
-        #             break
-        # else:
-        #     for chon in chons:
-        #         # Condition 2 : Check is multiple stitch/noisette in the same place
-        #         annotation['duplicate'] = all(
-        #             abs(float(annotation['norm_points'][i]) - float(chon_coord)) < norm_diff_duplicate_error
-        #             for i, chon_coord in enumerate(chon)
-        #         )
-        #         if annotation['duplicate']:
-        #             break
-        #
-        # if not annotation['duplicate']:
-        #     if annotation['index'] == 0:
-        #         anonymes.append(annotation['norm_points'])
-        #     else:
-        #         chons.append(annotation['norm_points'])
-        #
-        # if not annotation['duplicate']:
-        #     annotation['valid'] = True
-        #     validated_annotations.append(annotation['line'])
+        if annotation['index'] == 0:
+            anonyme_count = anonyme_count + 1
+        if annotation['index'] == 1:
+            noisette_count = noisette_count + 1
+        if annotation['index'] == 2:
+            stitch_count = stitch_count + 1
 
-        validated_annotations.append(annotation['line'])
-        logs.append([annotation['index'], annotation['label'], annotation['conf']]) # , annotation['valid']
+        if annotation['index'] == 0:
+            for anonyme in anonymes:
+                duplicate = all(
+                    abs(float(annotation['norm_points'][i]) - float(anonyme_coord)) < norm_diff_duplicate_error
+                    for i, anonyme_coord in enumerate(anonyme)
+                )
+                if duplicate:
+                    break
+        else:
+            for chon in chons:
+                duplicate = all(
+                    abs(float(annotation['norm_points'][i]) - float(chon_coord)) < norm_diff_duplicate_error
+                    for i, chon_coord in enumerate(chon)
+                )
+                if duplicate:
+                    break
 
-        #if annotation['index'] > 0:
+        if not duplicate:
+            if annotation['index'] == 0:
+                anonymes.append(annotation['norm_points'])
+            else:
+                chons.append(annotation['norm_points'])
+        else:
+            break
+
+        annotations.append(annotation['line'])
+        logs.append([annotation['index'], annotation['label'], annotation['conf']])  # , annotation['valid']
+
         img = trace_detected_box_coords(
             img,
             annotation['orth_points'][0], annotation['orth_points'][1],
@@ -141,7 +144,14 @@ def valid_annotations(img, annotation_objs, logs):
             (255, 255, 255),
         )
 
-    return img, validated_annotations
+    # Condition 2 : Si stitch > 1, noisette > 1 ou stitch + noisette != guinea pig
+    capture_ok = (not duplicate
+                  and anonyme_count == (noisette_count + stitch_count)
+                  and noisette_count <= 1
+                  and stitch_count <= 1
+                  )
+
+    return img, annotations, capture_ok
 
 
 def detected_boxes_with_resize(
