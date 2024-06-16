@@ -27,7 +27,7 @@ if __name__ == '__main__':
     print(f"Start at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     try:
-        train('guinea-pig-v3+chons+camera-v4', 'camera-v5')
+        train('guinea-pig-v3+chons+camera-v5', 'camera-v6')
     except PermissionError:
         print('Permission error')
 
