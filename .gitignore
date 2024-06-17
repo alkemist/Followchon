@@ -15,6 +15,7 @@ yolov8n.pt
 
 __pycache__
 
+/live/examples/
 /live/captures/
 !/live/captures/.gitignore
 /live/records/

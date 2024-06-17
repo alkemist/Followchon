@@ -1,0 +1,139 @@
+import os
+import cv2
+from pathlib import Path
+from datetime import datetime
+
+from .annotation import Annotation
+from ..data.zones import Zones
+from .classes.guinea_pig import GuineaPig
+from .classes.noisette import Noisette
+from .classes.stitch import Stitch
+from ..helpers.image import ImageHelper
+from ..helpers.array import ArrayHelper
+
+
+class Capture:
+    capture_width = 0
+    capture_height = 0
+    cls = list()
+    norm_diff_duplicate_error = 0.1
+
+    @staticmethod
+    def set_classes(cls):
+        Capture.cls = cls
+
+    @staticmethod
+    def set_capture_size(capture_width, capture_height):
+        Capture.capture_width = capture_width
+        Capture.capture_height = capture_height
+
+    def __init__(self, frame):
+        self.annotations = list()
+        self.frame = frame
+
+        (h_img, w_img) = frame.shape[:2]
+        Annotation.set_image_size(w_img, h_img)
+
+        self.valid = False
+        self.cls_counts = {}
+        self.cls_zones = {}
+        self.log = list()
+
+        for cls in Capture.cls:
+            self.cls_counts[cls] = 0
+            self.cls_zones[cls] = None
+
+    def detect(self, results):
+        frame_copy = self.frame.copy()
+        anonymes = list()
+        chons = list()
+        duplicate = False
+
+        self.annotations = list()
+        self.log = list()
+
+        for r in results:
+            boxes = r.boxes
+
+            for box in boxes:
+                annotation = Annotation(box)
+
+                # Condition 1 : Good detection
+                if annotation.conf > 0.60:
+
+                    # Condition 2 : No duplicate
+                    if len(anonymes) > 0 and annotation.cls == GuineaPig.cls:
+                        duplicate = all(
+                            annotation.norm_center[0] - anonyme_center[0] < Capture.norm_diff_duplicate_error
+                            for i, anonyme_center in enumerate(anonymes)
+                        )
+
+                    if len(chons) and (annotation.cls == Noisette.cls or annotation.cls == Stitch.cls):
+                        duplicate = all(
+                            annotation.norm_center[0] - chon_center[0] < Capture.norm_diff_duplicate_error
+                            for i, chon_center in enumerate(chons)
+                        )
+
+                    if not duplicate:
+                        if annotation.cls == GuineaPig.cls:
+                            anonymes.append(annotation.norm_center)
+
+                        if annotation.cls == Noisette.cls or annotation.cls == Stitch.cls:
+                            chons.append(annotation.norm_center)
+
+                        self.cls_counts[annotation.cls] \
+                            = self.cls_counts[annotation.cls] + 1 if annotation.cls in self.cls_counts else 1
+                        self.cls_zones[annotation.cls] = annotation.zone
+
+                        self.annotations.append(annotation)
+                    else:
+                        break
+
+        self.annotations = ArrayHelper.sort(self.annotations, lambda a1, a2: a1.cls - a2.cls)
+
+        for annotation in self.annotations:
+            if annotation.zone is not None:
+                self.log.append((annotation.label, annotation.zone.name.value, annotation.conf))
+            else:
+                self.log.append((annotation.label, annotation.conf))
+            frame_copy = annotation.trace(frame_copy)
+
+        # Condition 3 : Consistent accounting
+        # Condition 4 : Outside certain areas
+        self.valid = \
+            (
+                    self.cls_counts[Stitch.cls] == 1
+                    or self.cls_counts[Noisette.cls] == 1
+            ) \
+            and self.cls_counts[GuineaPig.cls] == self.cls_counts[Noisette.cls] + self.cls_counts[Stitch.cls] \
+            and any([
+                annotation.zone is None or (
+                        annotation.zone.name != Zones.TUNNEL
+                        and annotation.zone.name != Zones.FOIN
+                        and annotation.zone.name != Zones.CACHETTE
+                )
+                for annotation in self.annotations
+            ])
+
+        return frame_copy
+
+    def save(self, captures_directory):
+        filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
+
+        captures_labels_dir = f"{captures_directory}/labels"
+        captures_images_dir = f"{captures_directory}/images"
+
+        if not os.path.exists(captures_images_dir):
+            os.makedirs(captures_images_dir)
+
+        cv2.imwrite(
+            f'{captures_images_dir}/{filename}.jpg',
+            ImageHelper.resize_with_ratio(self.frame, Capture.capture_width, Capture.capture_height)
+        )
+
+        annotations = [annotation.line for annotation in self.annotations]
+        annotations.sort()
+
+        file = Path(f'{captures_labels_dir}/{filename}.txt')
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text("".join(annotations))
