@@ -3,7 +3,5 @@ ultralytics~=8.2.26
 torch~=2.2.0
 torchvision~=0.17
 python-dotenv~=1.0.1
-imageio~=2.34.1
-imageio-ffmpeg~=0.5.1
 ffmpeg~=1.4
 opencv-python~=4.10.0.82

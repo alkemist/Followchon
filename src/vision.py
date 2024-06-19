@@ -1,8 +1,13 @@
 # venv/bin/python -m src.vision
+import os
 
 from .models.streamer import Streamer
+from dotenv import load_dotenv
+
+load_dotenv()
 
 streamer = Streamer(
+    os.getenv('LIVE_STREAM_PATH'),
     './models/guinea-pig-v3+chons+camera-v6.pt',
     './live/records',
     './live/captures',

@@ -52,13 +52,13 @@ class Model:
         if save_enabled and capture.valid:
             capture.save(captures_directory)
 
-        if verbose and len(capture.log) > 0:
-            print(capture.log)
-
-            if noisette_moved:
-                print(f"{Noisette.name} => {self.noisette.zone.name.value}")
-
-            if stitch_moved:
-                print(f"{Stitch.name} => {self.stitch.zone.name.value}")
+        # if verbose and len(capture.log) > 0:
+        #     print(capture.log)
+        #
+        #     if noisette_moved:
+        #         print(f"{Noisette.name} => {self.noisette.zone.name.value}")
+        #
+        #     if stitch_moved:
+        #         print(f"{Stitch.name} => {self.stitch.zone.name.value}")
 
         return ImageHelper.resize_with_ratio(frame, self.capture_width, self.capture_height)

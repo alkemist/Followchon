@@ -38,4 +38,9 @@ https://gist.github.com/rutcreate/c0041e842f858ceb455b748809763ddb
 
 `nvidia-smi`  
 
+### Procédure raspberry pi
+`sudo apt-get install python3-launchpadlib`  
+`cd followchon`
+`python3 -m venv venv`
+`venv/bin/python -m pip install -r requirements.txt`
 
