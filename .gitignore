@@ -3,6 +3,8 @@
 /.sass-cache/
 ###< phpstorm ###
 
+/venv/
+
 /datasets/
 !/datasets/.gitignore
 
