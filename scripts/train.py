@@ -1,15 +1,19 @@
 from ultralytics import YOLO
 from datetime import datetime
 import torch
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-def train(model_name, dataset_name, epochs=50):
-    model = YOLO(f'models/{model_name}.pt')
+def train():
+    model = YOLO(os.getenv('TRAIN_MODEL_PATH'))
     model.train(
-        data=f'datasets/{dataset_name}/data.yaml',
-        epochs=epochs,
+        data=os.getenv('TRAIN_DATASET_PATH'),
+        epochs=50,
         imgsz=1024,
-        name=dataset_name,
+        name=os.getenv('TRAIN_DATASET_NAME'),
         verbose=True,
         save=False,
         project='runs',
@@ -27,7 +31,7 @@ if __name__ == '__main__':
     print(f"Start at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     try:
-        train('guinea-pig-v3+chons+camera-v5', 'camera-v6')
+        train()
     except PermissionError:
         print('Permission error')
 

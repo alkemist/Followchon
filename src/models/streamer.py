@@ -59,8 +59,8 @@ class Streamer:
             return_code = process.poll()
 
             if return_code is not None:
-                # if self.verbose:
-                #     print('Restart recording')
+                if self.verbose:
+                    print('Restart recording')
                 process = self.record()
 
             if self.delete_record:
@@ -74,8 +74,8 @@ class Streamer:
             if (records_count > 1 or not self.loop_enabled) and last_record_index < records_count:
                 last_record = records[last_record_index]
 
-                # if self.verbose:
-                #     print(f"Next record : {last_record}")
+                if self.verbose:
+                    print(f"Next record : {last_record}")
 
                 self.capture(last_record)
 
@@ -115,8 +115,8 @@ class Streamer:
                     if self.show_stram:
                         cv2.imshow('Camera', frame)
             else:
-                # if self.verbose:
-                #     print(f"End record : {last_record}")
+                if self.verbose:
+                    print(f"End record : {last_record}")
 
                 if self.delete_record:
                     os.remove(camera_record_filename)
