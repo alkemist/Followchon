@@ -5,3 +5,4 @@ torchvision~=0.17
 python-dotenv~=1.0.1
 ffmpeg~=1.4
 opencv-python~=4.10.0.82
+ncnn~=1.0.20240410

@@ -1,0 +1,16 @@
+description: Ultralytics guinea-pig-v3+chons+camera-v7 model trained on datasets/camera-v7/data.yaml
+author: Ultralytics
+date: '2024-06-20T15:41:19.735564'
+version: 8.2.28
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 1024
+- 1024
+names:
+  0: guinea pig
+  1: noisette
+  2: stitch
