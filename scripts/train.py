@@ -3,9 +3,13 @@ from datetime import datetime
 import torch
 import os
 from dotenv import load_dotenv
+import shutil
 
 load_dotenv()
 
+model_base_name = 'guinea-pig-'
+runs_dir = 'runs'
+models_dir = 'models'
 
 def train():
     model = YOLO(os.getenv('TRAIN_MODEL_PATH'))
@@ -16,9 +20,9 @@ def train():
         name=os.getenv('TRAIN_DATASET_NAME'),
         verbose=True,
         save=False,
-        project='runs',
+        project=runs_dir,
         exist_ok=True,
-        device=0
+        device=os.getenv('TRAIN_DEVICE')
     )
 
 
@@ -36,3 +40,6 @@ if __name__ == '__main__':
         print('Permission error')
 
     print(f"End at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    shutil.move(f"{runs_dir}/{os.getenv('TRAIN_DATASET_NAME')}/weights/last.pt",
+                f"{models_dir}/{model_base_name}{os.getenv('TRAIN_DATASET_NAME')}.pt")

@@ -3,6 +3,7 @@ MODEL_PATH=./models/guinea-pig-v3+chons+camera-v6.pt
 TRAIN_MODEL_PATH=models/guinea-pig-v3+chons+camera-v6.pt
 TRAIN_DATASET_PATH=datasets/camera-v6/data.yaml
 TRAIN_DATASET_NAME=camera-v6
+TRAIN_DEVICE=cpu
 
 check_all_records=True
 delete_record=True
