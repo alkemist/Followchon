@@ -111,6 +111,7 @@ class Capture:
                         annotation.zone.name != Zones.TUNNEL
                         and annotation.zone.name != Zones.FOIN
                         and annotation.zone.name != Zones.CACHETTE
+                        and annotation.zone.name != Zones.CLAPIER
                 )
                 for annotation in self.annotations
             ])
