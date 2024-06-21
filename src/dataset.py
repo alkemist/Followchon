@@ -33,8 +33,9 @@ def moveTo(files, ext, src_dir, dst_dir):
         os.makedirs(dst_dir)
 
     for file in files:
-        shutil.move(f"{src_dir}/{file}.{ext}",
-                    f"{dst_dir}/{file}.{ext}")
+        if os.path.exists(f"{src_dir}/{file}.{ext}"):
+            shutil.move(f"{src_dir}/{file}.{ext}",
+                        f"{dst_dir}/{file}.{ext}")
 
 
 annotations = FileHelper.list_files(dataset_train_labels_path, r'.*\.(txt)$').tolist()
