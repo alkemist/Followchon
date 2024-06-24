@@ -103,7 +103,7 @@ class Capture:
         self.valid = \
             (
                     self.cls_counts[Stitch.cls] == 1
-                    or self.cls_counts[Noisette.cls] == 1
+                    and self.cls_counts[Noisette.cls] == 1
             ) \
             and self.cls_counts[GuineaPig.cls] == self.cls_counts[Noisette.cls] + self.cls_counts[Stitch.cls] \
             and any([

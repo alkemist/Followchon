@@ -19,6 +19,7 @@ __pycache__
 
 /live/examples/
 /live/captures/
+/live/backup
 !/live/captures/.gitignore
 /live/records/
 !/live/records/.gitignore

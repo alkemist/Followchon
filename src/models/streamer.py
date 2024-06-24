@@ -7,6 +7,14 @@ from ..helpers.file import FileHelper
 from .model import Model
 
 
+def process_status(process_name):
+    try:
+        subprocess.check_output(["pgrep", process_name])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 class Streamer:
 
     def __init__(
@@ -58,7 +66,7 @@ class Streamer:
         while not self.stop:
             return_code = process.poll()
 
-            if return_code is not None:
+            if return_code is not None or not process_status('ffmpeg'):
                 if self.verbose:
                     print('Restart recording')
                 process = self.record()

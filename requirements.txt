@@ -7,3 +7,4 @@ ffmpeg~=1.4
 opencv-python~=4.10.0.84
 ncnn~=1.0.20240410
 supervision~=0.21.0
+pillow~=10.3.0
