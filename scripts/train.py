@@ -11,6 +11,7 @@ model_base_name = 'guinea-pig-'
 runs_dir = 'runs'
 models_dir = 'models'
 
+
 def train():
     model = YOLO(os.getenv('TRAIN_MODEL_PATH'))
     model.train(
@@ -22,7 +23,8 @@ def train():
         save=False,
         project=runs_dir,
         exist_ok=True,
-        device=os.getenv('TRAIN_DEVICE')
+        device=os.getenv('TRAIN_DEVICE'),
+        workers=8
     )
 
 
