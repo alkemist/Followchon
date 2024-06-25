@@ -2,28 +2,50 @@
 import pathlib
 import os
 import cv2
+import numpy
 from PIL import Image
 
 from .helpers.file import FileHelper
 from .helpers.image import ImageHelper
+from .helpers.array import ArrayHelper
 
 labels_path = './live/backup/labels'
 images_path = './live/backup/images'
 image_width = 1024
 image_height = 768
-active = True
+labels = ['guinea pig', 'noisette', 'stitch']
 
+active = False
 
 annotations = FileHelper.list_files(labels_path, r'.*\.(txt)$').tolist()
 images = FileHelper.list_files(images_path, r'.*\.(jpg|png)$').tolist()
 
 for annotation in annotations:
+    annotation_path = f"{labels_path}/{annotation}"
     name = pathlib.Path(annotation).stem
+    has_errors = False
 
-    if not os.path.exists(f"{images_path}/{name}.jpg") and not os.path.exists(f"{images_path}/{name}.png"):
-        print(f"Image don't exist", f"{images_path}/{name}")
+    if not os.path.exists(f"{images_path}/{name}.jpg"):
+        print(f"Image don't exist", f"{images_path}/{name}.jpg")
         if active:
-            os.remove(f"{labels_path}/{name}.txt")
+            os.remove(annotation_path)
+
+    # lines = FileHelper.read_lines(annotation_path)
+    # lines_ok = list()
+    #
+    # for line in lines:
+    #     values = line.split(' ')
+    #     if int(values[0]) > len(labels) - 1:
+    #         print(f"Annotation error", f"{labels_path}/{annotation}")
+    #         has_errors = True
+    #     else:
+    #         lines_ok.append(line)
+    #
+    # if active and has_errors:
+    #     file_annotation = open(annotation_path, "w")
+    #     file_annotation.write(
+    #         "\n".join(lines_ok)
+    #     )
 
 
 for image in images:

@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-check_all_records = os.getenv('check_all_records') == 'True'
-verbose = os.getenv('verbose') == 'True'
-save_enabled = os.getenv('save_enabled') == 'True'
-loop_enabled = os.getenv('loop_enabled') == 'True'
-delete_record = os.getenv('delete_record') == 'True'
-show_stream = os.getenv('show_stream') == 'True'
+check_all_records = os.getenv('CHECK_ALL_RECORDS') == 'True'
+verbose = os.getenv('VERBOSE') == 'True'
+save_enabled = os.getenv('SAVE_ENABLED') == 'True'
+loop_enabled = os.getenv('LOOP_ENABLED') == 'True'
+delete_record = os.getenv('DELETE_RECORD') == 'True'
+show_stream = os.getenv('SHOW_STREAM') == 'True'
+frame_time_seconds = float(os.getenv('FRAME_TIME_SECONDS'))  # 0.03 < > 0.02
 
 streamer = Streamer(
     os.getenv('LIVE_STREAM_PATH'),
@@ -20,6 +21,7 @@ streamer = Streamer(
     './live/captures',
     capture_width=1024,
     capture_height=768,
+    frame_time_seconds=0.025,  # 0.03 < > 0.02
     check_all_records=check_all_records,
     show_stream=show_stream,
     verbose=verbose,

@@ -17,27 +17,4 @@ yolov8n.pt
 
 __pycache__
 
-/live/examples/
-/live/captures/
-/live/backup
-!/live/captures/.gitignore
-/live/records/
-!/live/records/.gitignore
-/live/errors/
-!/live/errors/.gitignore
-/live/screens/
-!/live/screens/.gitignore
-/live/dataset/train/images/
-!/live/dataset/train/images/.gitignore
-/live/dataset/train/screens/
-!/live/dataset/train/screens/.gitignore
-/live/dataset/train/labels/
-!/live/dataset/train/labels/classes.txt
-/live/dataset/test/images/
-!/live/dataset/test/images/.gitignore
-/live/dataset/test/labels/
-!/live/dataset/test/labels/classes.txt
-/live/dataset/val/images/
-!/live/dataset/val/images/.gitignore
-/live/dataset/val/labels/
-!/live/dataset/val/labels/classes.txt
+/live/

@@ -5,12 +5,16 @@ TRAIN_DATASET_PATH=datasets/camera-v6/data.yaml
 TRAIN_DATASET_NAME=camera-v6
 TRAIN_DEVICE=cpu
 
-check_all_records=True
-delete_record=True
-loop_enabled=True
-save_enabled=True
-verbose=True
-show_stream=False
+CHECK_ALL_RECORDS=True
+DELETE_RECORD=True
+LOOP_ENABLED=True
+SAVE_ENABLED=True
+VERBOSE=True
+SHOW_STREAM=False
+FRAME_TIME_SECONDS=0.025
+
+OPENCV_LOG_LEVEL=d
+OPENCV_VIDEOIO_DEBUG=1
 
 OPENCV_LOG_LEVEL=d
 OPENCV_VIDEOIO_DEBUG=1

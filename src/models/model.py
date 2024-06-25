@@ -1,4 +1,5 @@
 from ultralytics import YOLO
+import time
 
 from ..data.zones import data_zones
 from ..helpers.image import ImageHelper
@@ -32,9 +33,12 @@ class Model:
         Capture.set_classes(range(len(self.model.names)))
         Capture.set_capture_size(self.capture_width, self.capture_height)
         Annotation.set_labels(self.model.names)
+        self.save_time = 0
 
     def detect(self, frame, captures_directory, save_enabled=False, verbose=False):
         results = self.model(frame, stream=True, verbose=False)
+
+        save_time_elapsed = time.time() - self.save_time
         noisette_moved = False
         stitch_moved = False
 
@@ -49,11 +53,12 @@ class Model:
                 and capture.cls_zones[Stitch.cls] is not None:
             stitch_moved = self.stitch.set_zone(capture.cls_zones[Stitch.cls])
 
-        if save_enabled and capture.valid:
+        if save_enabled and capture.valid and save_time_elapsed > 1:
+            self.save_time = time.time()
             capture.save(captures_directory)
 
-        if verbose and len(capture.log) > 0:
-            print(capture.log)
+        # if verbose and len(capture.log) > 0:
+        #     print(capture.log)
 
             # if noisette_moved:
             #     print(f"{Noisette.name} => {self.noisette.zone.name.value}")

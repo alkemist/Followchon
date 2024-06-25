@@ -45,8 +45,7 @@ class Capture:
 
     def detect(self, results):
         frame_copy = self.frame.copy()
-        anonymes = list()
-        chons = list()
+        annotations_by_cls = {}
         duplicate = False
 
         self.annotations = list()
@@ -62,24 +61,16 @@ class Capture:
                 if annotation.conf > 0.60:
 
                     # Condition 2 : No duplicate
-                    if len(anonymes) > 0 and annotation.cls == GuineaPig.cls:
+                    if annotation.cls in annotations_by_cls and len(annotations_by_cls[annotation.cls]) > 0:
                         duplicate = all(
-                            annotation.norm_center[0] - anonyme_center[0] < Capture.norm_diff_duplicate_error
-                            for i, anonyme_center in enumerate(anonymes)
-                        )
-
-                    if len(chons) and (annotation.cls == Noisette.cls or annotation.cls == Stitch.cls):
-                        duplicate = all(
-                            annotation.norm_center[0] - chon_center[0] < Capture.norm_diff_duplicate_error
-                            for i, chon_center in enumerate(chons)
+                            annotation.norm_center[0] - center[0] < Capture.norm_diff_duplicate_error
+                            for i, center in enumerate(annotations_by_cls[annotation.cls])
                         )
 
                     if not duplicate:
-                        if annotation.cls == GuineaPig.cls:
-                            anonymes.append(annotation.norm_center)
-
-                        if annotation.cls == Noisette.cls or annotation.cls == Stitch.cls:
-                            chons.append(annotation.norm_center)
+                        if annotation.cls not in annotations_by_cls:
+                            annotations_by_cls[annotation.cls] = list()
+                        annotations_by_cls[annotation.cls].append(annotation.norm_center)
 
                         self.cls_counts[annotation.cls] \
                             = self.cls_counts[annotation.cls] + 1 if annotation.cls in self.cls_counts else 1
@@ -98,23 +89,28 @@ class Capture:
                 self.log.append((annotation.label, annotation.conf))
             frame_copy = annotation.trace(frame_copy)
 
-        # Condition 3 : Consistent accounting
-        # Condition 4 : Outside certain areas
+        # Condition : Consistent accounting
+        # Condition : Outside areas
         self.valid = \
             (
                     self.cls_counts[Stitch.cls] == 1
                     and self.cls_counts[Noisette.cls] == 1
+                    or any([
+                        annotation.zone is not None and
+                        (
+                            annotation.zone.name == Zones.FONTAINE
+                        )
+                        for annotation in self.annotations
+                    ])
             ) \
             and self.cls_counts[GuineaPig.cls] == self.cls_counts[Noisette.cls] + self.cls_counts[Stitch.cls] \
-            and any([
-                annotation.zone is None or (
-                        annotation.zone.name != Zones.TUNNEL
-                        and annotation.zone.name != Zones.FOIN
-                        and annotation.zone.name != Zones.CACHETTE
-                        and annotation.zone.name != Zones.CLAPIER
-                )
-                for annotation in self.annotations
-            ])
+            # and any([
+            #     annotation.zone is None or (
+            #             annotation.zone.name != Zones.TUNNEL
+            #             and annotation.zone.name != Zones.FOIN
+            #     )
+            #     for annotation in self.annotations
+            # ])
 
         return frame_copy
 
