@@ -7,7 +7,6 @@ import shutil
 
 load_dotenv()
 
-model_base_name = 'guinea-pig-'
 runs_dir = 'runs'
 models_dir = 'models'
 
@@ -44,4 +43,4 @@ if __name__ == '__main__':
     print(f"End at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     shutil.move(f"{runs_dir}/{os.getenv('TRAIN_DATASET_NAME')}/weights/last.pt",
-                f"{models_dir}/{model_base_name}{os.getenv('TRAIN_DATASET_NAME')}.pt")
+                f"{models_dir}/{os.getenv('TRAIN_DATASET_NAME')}.pt")
