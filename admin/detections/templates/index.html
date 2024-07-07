@@ -1,0 +1,52 @@
+{% load compress %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr-FR" dir="ltr">
+    <head>
+        {% compress css %}
+            <link type="text/x-scss" href="{% static 'carousel.scss' %}" rel="stylesheet" media="screen">
+        {% endcompress %}
+    </head>
+    <body>
+        <section>
+            <div class="container">
+                {% if prev_id %}
+                    <a href="?id={{ prev_id }}" class="left navigation"><span>❰</span></a>
+                {% else %}
+                    <div class="left navigation"></div>
+                {% endif %}
+                <div class="carousel">
+                    {% for detection in detections %}
+                        <input type="radio" name="slides" {% if detection.id == current_id %}checked="checked"{% endif %} id="slide-{{ forloop.counter }}">
+                    {% endfor %}
+                    <ul class="carousel__slides">
+                        {% for detection in detections %}
+                            <li data-href="{% url 'detections:detail' detection.id %}" class="carousel__slide">
+                                <figure>
+                                    <div>
+                                        <img src="{{ detection.photo_path }}" alt="">
+                                    </div>
+                                </figure>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="carousel__thumbnails">
+                        {% for detection in detections %}
+                            <li>
+                                <label for="slide-{{ forloop.counter }}">
+                                        <img src="{{ detection.photo_path }}" alt="">
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if next_id %}
+                    <a href="?id={{ next_id }}" class="right navigation"><span>❱</span></a>
+                {% else %}
+                    <div class="right navigation"></div>
+                {% endif %}
+            </div>
+        </section>
+    </body>
+</html>
+

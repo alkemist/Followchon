@@ -58,7 +58,7 @@ class Capture:
                 annotation = Annotation(box)
 
                 # Condition 1 : Good detection
-                if annotation.conf > 0.60:
+                if annotation.conf > 0.80:
 
                     # Condition 2 : No duplicate
                     if annotation.cls in annotations_by_cls and len(annotations_by_cls[annotation.cls]) > 0:

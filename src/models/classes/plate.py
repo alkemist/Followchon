@@ -1,7 +1,7 @@
 from src.models.classes.guinea_pig import GuineaPig
 
 
-class Stitch(GuineaPig):
+class Plate(GuineaPig):
     cls = 3
     name = 'Plate'
 

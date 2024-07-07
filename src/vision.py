@@ -9,6 +9,7 @@ load_dotenv()
 check_all_records = os.getenv('CHECK_ALL_RECORDS') == 'True'
 verbose = os.getenv('VERBOSE') == 'True'
 save_enabled = os.getenv('SAVE_ENABLED') == 'True'
+track_enabled = os.getenv('TRACK_ENABLED') == 'True'
 loop_enabled = os.getenv('LOOP_ENABLED') == 'True'
 delete_record = os.getenv('DELETE_RECORD') == 'True'
 show_stream = os.getenv('SHOW_STREAM') == 'True'
@@ -26,6 +27,7 @@ streamer = Streamer(
     show_stream=show_stream,
     verbose=verbose,
     save_enabled=save_enabled,
+    track_enabled=save_enabled,
     loop_enabled=loop_enabled,
     delete_record=delete_record,
 )

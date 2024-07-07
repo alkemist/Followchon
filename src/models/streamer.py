@@ -31,6 +31,7 @@ class Streamer:
             delete_record=False,
             loop_enabled=False,
             save_enabled=False,
+            track_enabled=False,
             verbose=False,
             show_stream=False,
     ):
@@ -38,6 +39,7 @@ class Streamer:
         self.delete_record = delete_record
         self.loop_enabled = loop_enabled
         self.save_enabled = save_enabled
+        self.track_enabled = track_enabled
         self.verbose = verbose
         self.show_stram = show_stream
 
