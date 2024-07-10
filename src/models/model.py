@@ -12,8 +12,8 @@ from .classes.stitch import Stitch
 
 class Model:
 
-    def __init__(self, model_path, capture_width, capture_height):
-        self.model = YOLO(model_path)
+    def __init__(self, model_path, capture_width, capture_height, capture_min_conf):
+        self.model = YOLO(model_path, task='detect')
         Annotation.set_zones([
             Zone(
                 zone['name'],
@@ -32,6 +32,7 @@ class Model:
 
         Capture.set_classes(range(len(self.model.names)))
         Capture.set_capture_size(self.capture_width, self.capture_height)
+        Capture.set_capture_min_conf(capture_min_conf)
         Annotation.set_labels(self.model.names)
         self.save_time = 0
 

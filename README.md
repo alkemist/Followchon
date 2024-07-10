@@ -44,3 +44,5 @@ https://gist.github.com/rutcreate/c0041e842f858ceb455b748809763ddb
 `python3 -m venv venv`
 `venv/bin/python -m pip install -r requirements.txt`
 
+### Export
+`venv/bin/yolo export model=models/guinea-pig-chons-v3.pt format=onnx imgsz=640`  

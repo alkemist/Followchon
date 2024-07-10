@@ -17,8 +17,8 @@ dataset_val_images_path = './live/dataset/val/images'
 dataset_train_labels_path = './live/dataset/train/labels'
 dataset_train_images_path = './live/dataset/train/images'
 
-dataset_test_percent = 0.2
-dataset_val_percent = 0.2
+dataset_test_percent = 0.1
+dataset_val_percent = 0.1
 
 
 def extract(items, count):

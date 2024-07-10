@@ -27,6 +27,7 @@ class Streamer:
             capture_width,
             capture_height,
             frame_time_seconds,
+            capture_min_conf,
             check_all_records=False,
             delete_record=False,
             loop_enabled=False,
@@ -48,8 +49,9 @@ class Streamer:
         self.records_directory = records_directory
         self.captures_directory = captures_directory
         self.frame_time_seconds = frame_time_seconds
+        self.capture_min_conf = capture_min_conf
 
-        self.model = Model(model_path, capture_width, capture_height)
+        self.model = Model(model_path, capture_width, capture_height, capture_min_conf)
 
     def record(self):
         command = (f"ffmpeg -hide_banner -y -loglevel error -rtsp_transport tcp -use_wallclock_as_timestamps "
@@ -116,6 +118,8 @@ class Streamer:
         frame_time = 0
 
         cap = cv2.VideoCapture(camera_record_filename)
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
 
         while cap.isOpened() and not self.stop:
             frame_time_elapsed = time.time() - frame_time

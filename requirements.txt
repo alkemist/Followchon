@@ -1,4 +1,4 @@
-numpy~=1.26.4
+numpy~=1.23.5
 ultralytics~=8.2.41
 torch~=2.2.0
 torchvision~=0.17
@@ -6,6 +6,7 @@ python-dotenv~=1.0.1
 ffmpeg~=1.4
 opencv-python~=4.10.0.84
 ncnn~=1.0.20240410
+onnx~=1.16.1
 Django~=5.0.6
 django_compressor~=4.5
 django-libsass~=0.9

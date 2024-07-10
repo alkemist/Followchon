@@ -13,9 +13,10 @@ from ..helpers.array import ArrayHelper
 
 
 class Capture:
+    cls = list()
     capture_width = 0
     capture_height = 0
-    cls = list()
+    capture_min_conf = 0.8
     norm_diff_duplicate_error = 0.1
 
     @staticmethod
@@ -26,6 +27,10 @@ class Capture:
     def set_capture_size(capture_width, capture_height):
         Capture.capture_width = capture_width
         Capture.capture_height = capture_height
+
+    @staticmethod
+    def set_capture_min_conf(capture_min_conf):
+        Capture.capture_min_conf = capture_min_conf
 
     def __init__(self, frame):
         self.annotations = list()
@@ -58,7 +63,7 @@ class Capture:
                 annotation = Annotation(box)
 
                 # Condition 1 : Good detection
-                if annotation.conf > 0.80:
+                if annotation.conf > Capture.capture_min_conf:
 
                     # Condition 2 : No duplicate
                     if annotation.cls in annotations_by_cls and len(annotations_by_cls[annotation.cls]) > 0:

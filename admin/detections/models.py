@@ -22,6 +22,10 @@ class Zone(models.Model):
 
 class Detection(models.Model):
     base_dir = 'static/captures'
+    image_dir = 'images'
+    verified_dir = 'verified'
+    draft_dir = 'draft'
+
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
 
@@ -31,13 +35,16 @@ class Detection(models.Model):
     height = models.FloatField(null=True)
 
     score = models.IntegerField(null=True)
+    verified = models.BooleanField(default=False)
 
     date = models.DateTimeField()
 
     photo_file = models.CharField(null=True, max_length=200)
 
     def photo_path(self):
-        return f"{self.base_dir}/{self.photo_file}"
+        return (f"{self.base_dir}/{self.photo_file}/"
+                f"{self.verified_dir if self.verified else self.draft_dir}/"
+                f"{self.image_dir}")
 
     def image_tag(self):
         return mark_safe('<a href="/%s" target="_blank">'
