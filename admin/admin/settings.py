@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,14 +31,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'configuration.apps.ConfigurationConfig',
     'detections.apps.DetectionsConfig',
+    'front.apps.FrontConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'compressor'
+    'compressor',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +83,6 @@ COMPRESS_PRECOMPILERS = (
 
 WSGI_APPLICATION = 'admin.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -89,7 +92,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'sqlite3.db',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -109,11 +111,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'fr-FR'
+
+LANGUAGES = [
+    ('fr', _('French')),
+]
 
 TIME_ZONE = 'Europe/Paris'
 
@@ -121,20 +126,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_ROOT = 'static'
 STATIC_URL = 'static/'
-
-# STATIC_ROOT = 'static'
-# STATIC_URL = '/static/'
-# MEDIA_ROOT = 'admin/media'
-# MEDIA_URL = '/media/'
-# STATIC_URL = '/static/'
-# STATIC_ROOT = BASE_DIR / 'static'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
