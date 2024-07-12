@@ -6,6 +6,21 @@
         {% compress css %}
             <link type="text/x-scss" href="{% static 'carousel.scss' %}" rel="stylesheet" media="screen">
         {% endcompress %}
+        <script>
+            const detections = {{ detections|safe }};
+            console.log(detections);
+
+            window.addEventListener("load", (event) => {
+                const canvas = document.getElementById("canvas");
+
+                if(canvas) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.beginPath();
+                    ctx.rect(10, 20, 150, 100);
+                    ctx.fill();
+                }
+            });
+        </script>
     </head>
     <body>
         <section>
@@ -24,6 +39,7 @@
                             <li data-href="{% url 'front:detail' capture.id %}" class="carousel__slide">
                                 <figure>
                                     <div>
+                                        <!--<canvas id="canvas" width="{{ size.0 }}" height="{{ size.1 }}"></canvas>-->
                                         <img src="{{ capture.photo_path }}" alt="">
                                     </div>
                                 </figure>

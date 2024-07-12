@@ -1,9 +1,12 @@
 import pathlib
 import shutil
 
+import cv2
 from configuration.models import Family, Zone
 from django.db import models
 from django.utils.safestring import mark_safe
+
+from src.helpers.yolo import YoloHelper
 
 
 class Capture(models.Model):
@@ -18,6 +21,10 @@ class Capture(models.Model):
     photo_file = models.CharField(null=True, max_length=200)
 
     date = models.DateTimeField()
+
+    def size(self):
+        im = cv2.imread(self.photo_path())
+        return im.shape[1::-1]
 
     def move_directory(self, verified):
         shutil.move(self.photo_path(not verified), self.photo_path(verified))
@@ -46,7 +53,7 @@ class Capture(models.Model):
 
 
 class Detection(models.Model):
-    capture = models.ForeignKey(Capture, on_delete=models.CASCADE)
+    capture = models.ForeignKey(Capture, on_delete=models.CASCADE, related_name='detections')
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
 
@@ -59,3 +66,24 @@ class Detection(models.Model):
 
     def __str__(self):
         return f"{self.family.name} in {self.zone.name}"
+
+    def toJson(self):
+        w_img, h_img = self.capture.size()
+        return {
+            'coords': YoloHelper.calc_orthogonal_points(
+                x_center_norm=self.center_x,
+                y_center_norm=self.center_y,
+                w_norm=self.width,
+                h_norm=self.height,
+                w_img=w_img,
+                h_img=h_img
+            ),
+            'family': self.family.name,
+            'zone': self.zone.name,
+            'center_x': self.center_x,
+            'center_y': self.center_y,
+            'width': self.width,
+            'height': self.height,
+
+            'score': self.score,
+        }
