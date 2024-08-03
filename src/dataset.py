@@ -1,10 +1,14 @@
 # venv/bin/python -m src.dataset
-import pathlib
 import os
-import shutil
+import pathlib
 import random
+import shutil
+
+from dotenv import load_dotenv
 
 from .helpers.file import FileHelper
+
+load_dotenv()
 
 dataset_source_labels_path = './live/saved/labels'
 dataset_source_images_path = './live/saved/images'
@@ -17,8 +21,8 @@ dataset_val_images_path = './live/dataset/val/images'
 dataset_train_labels_path = './live/dataset/train/labels'
 dataset_train_images_path = './live/dataset/train/images'
 
-dataset_test_percent = 0.1
-dataset_val_percent = 0.1
+dataset_test_percent = float(os.getenv('DATASET_TEST_PERCENT'))
+dataset_val_percent = float(os.getenv('DATASET_VAL_PERCENT'))
 
 
 def extract(items, count):
@@ -61,5 +65,3 @@ copyTo(vals, 'jpg', dataset_source_images_path, dataset_val_images_path)
 trains = extract(annotations, train_count)
 copyTo(trains, 'txt', dataset_source_labels_path, dataset_train_labels_path)
 copyTo(trains, 'jpg', dataset_source_images_path, dataset_train_images_path)
-
-

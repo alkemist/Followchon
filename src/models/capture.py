@@ -1,15 +1,16 @@
 import os
-import cv2
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import cv2
 
 from .annotation import Annotation
-from ..data.zones import Zones
 from .classes.guinea_pig import GuineaPig
 from .classes.noisette import Noisette
 from .classes.stitch import Stitch
-from ..helpers.image import ImageHelper
+from ..data.zones import Zones
 from ..helpers.array import ArrayHelper
+from ..helpers.image import ImageHelper
 
 
 class Capture:
@@ -98,28 +99,31 @@ class Capture:
         # Condition : Outside areas
         self.valid = \
             (
-                    self.cls_counts[Stitch.cls] == 1
-                    and self.cls_counts[Noisette.cls] == 1
-                    or any([
+                    self.cls_counts[Stitch.cls] == 1 and
+                    self.cls_counts[Noisette.cls] == 1 or
+                    any([
                         annotation.zone is not None and
                         (
-                            annotation.zone.name == Zones.FONTAINE
+                                annotation.zone.name == Zones.FONTAINE
+                                or annotation.zone.name == Zones.TUNNEL
                         )
                         for annotation in self.annotations
                     ])
             ) \
+            and self.cls_counts[Stitch.cls] <= 1 and self.cls_counts[Noisette.cls] <= 1 \
             and self.cls_counts[GuineaPig.cls] == self.cls_counts[Noisette.cls] + self.cls_counts[Stitch.cls] \
             # and any([
-            #     annotation.zone is None or (
-            #             annotation.zone.name != Zones.TUNNEL
-            #             and annotation.zone.name != Zones.FOIN
-            #     )
-            #     for annotation in self.annotations
-            # ])
+        #     annotation.zone is None or (
+        #             annotation.zone.name != Zones.TUNNEL
+        #             and annotation.zone.name != Zones.FOIN
+        #     )
+        #     for annotation in self.annotations
+        # ])
 
         return frame_copy
 
     def save(self, captures_directory):
+
         filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
         captures_labels_dir = f"{captures_directory}/labels"

@@ -1,8 +1,9 @@
 # venv/bin/python -m src.vision
 import os
 
-from .models.streamer import Streamer
 from dotenv import load_dotenv
+
+from .models.streamer import Streamer
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ streamer = Streamer(
     show_stream=show_stream,
     verbose=verbose,
     save_enabled=save_enabled,
-    track_enabled=save_enabled,
+    track_enabled=track_enabled,
     loop_enabled=loop_enabled,
     delete_record=delete_record,
 )
